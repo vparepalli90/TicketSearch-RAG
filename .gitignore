@@ -1,0 +1,34 @@
+# Secrets
+.env
+
+# Virtual environments
+.venv/
+venv/
+
+# Generated vector stores
+chroma_db/
+rag_vectorstore/
+agent_vectorstore/
+**/chroma_db/
+**/rag_vectorstore/
+**/agent_vectorstore/
+
+# Generated outputs
+modules/1_embeddings/embeddings_similarity_analysis.png
+modules/5_evaluation/evaluation_report.csv
+modules/5_evaluation/evaluation_report.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Editors / tools
+.vscode/
+.idea/
+.claude/
+*.swp
+*.swo
+*.log
+.DS_Store

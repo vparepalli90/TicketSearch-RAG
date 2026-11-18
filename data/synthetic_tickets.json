@@ -1,0 +1,222 @@
+[
+  {
+    "ticket_id": "TICK-001",
+    "title": "Users unable to log in after password reset",
+    "description": "Multiple users report that after resetting their password through the self-service portal, they receive 'Invalid credentials' on login. The issue started after the identity provider was patched on Monday.",
+    "category": "Authentication",
+    "priority": "High",
+    "status": "Resolved",
+    "resolution": "The IdP patch changed the password hash cache TTL to 24 hours. Flushed the credential cache on all auth nodes and set the TTL back to 5 minutes in idp-config.yaml. Users could log in immediately after the flush.",
+    "created_date": "2026-01-05",
+    "tags": ["login", "password", "sso", "cache"]
+  },
+  {
+    "ticket_id": "TICK-002",
+    "title": "Nightly ETL job timing out on orders table",
+    "description": "The nightly ETL that loads the orders table into the warehouse has failed three nights in a row with a timeout after 4 hours. Row counts have grown 40% this quarter.",
+    "category": "Data Pipeline",
+    "priority": "High",
+    "status": "Resolved",
+    "resolution": "Switched the orders load from full refresh to incremental using the updated_at watermark column. Added an index on orders(updated_at). Job runtime dropped from 4+ hours to 22 minutes.",
+    "created_date": "2026-01-08",
+    "tags": ["etl", "timeout", "incremental", "warehouse"]
+  },
+  {
+    "ticket_id": "TICK-003",
+    "title": "Dashboard shows stale data from yesterday",
+    "description": "The executive sales dashboard is showing figures from the previous day even though the warehouse refresh completed at 6 AM. Users have to force refresh in the browser.",
+    "category": "Reporting",
+    "priority": "Medium",
+    "status": "Resolved",
+    "resolution": "The dashboard extract refresh schedule was set to 5 AM, before the warehouse load finished. Moved the extract refresh to 7 AM and added a dependency trigger so it runs only after the ETL success flag is written.",
+    "created_date": "2026-01-10",
+    "tags": ["dashboard", "stale data", "refresh schedule", "tableau"]
+  },
+  {
+    "ticket_id": "TICK-004",
+    "title": "API returning 502 Bad Gateway intermittently",
+    "description": "The customer-facing REST API returns 502 errors for roughly 3% of requests during peak hours between 9 and 11 AM. No errors appear in the application logs.",
+    "category": "Infrastructure",
+    "priority": "Critical",
+    "status": "Resolved",
+    "resolution": "The load balancer idle timeout (60s) was shorter than the app server keep-alive (75s), so the LB sent requests on connections the app had already closed. Set the app keep-alive to 55s, below the LB timeout. 502s dropped to zero.",
+    "created_date": "2026-01-12",
+    "tags": ["502", "load balancer", "keep-alive", "api"]
+  },
+  {
+    "ticket_id": "TICK-005",
+    "title": "SSO login loop with Okta",
+    "description": "Some users get stuck in a redirect loop between the app and Okta when signing in. Clearing cookies fixes it temporarily but it comes back.",
+    "category": "Authentication",
+    "priority": "High",
+    "status": "Resolved",
+    "resolution": "The session cookie was set with SameSite=Strict, so it was dropped on the cross-site redirect back from Okta. Changed the cookie to SameSite=Lax with Secure flag. The loop stopped for all affected users.",
+    "created_date": "2026-01-15",
+    "tags": ["sso", "okta", "redirect loop", "cookies"]
+  },
+  {
+    "ticket_id": "TICK-006",
+    "title": "Database CPU at 100% during month-end close",
+    "description": "The primary SQL Server instance hits 100% CPU during month-end financial close and reports take 10x longer. The issue happens every month on the last business day.",
+    "category": "Database",
+    "priority": "Critical",
+    "status": "Resolved",
+    "resolution": "Query Store showed a parameter-sniffing regression on the GL summary stored procedure. Added OPTION (RECOMPILE) to the problem statement and created a covering index on gl_entries(period_id, account_id) INCLUDE (amount). CPU peaked at 55% the next month.",
+    "created_date": "2026-01-31",
+    "tags": ["sql server", "cpu", "parameter sniffing", "index"]
+  },
+  {
+    "ticket_id": "TICK-007",
+    "title": "Email notifications not being delivered",
+    "description": "Customers are not receiving order confirmation emails. The application logs show the emails were sent successfully to the mail relay.",
+    "category": "Integration",
+    "priority": "High",
+    "status": "Resolved",
+    "resolution": "The SPF record did not include the new mail relay's IP range after the provider migration, so recipient servers marked mail as spam or rejected it. Updated the SPF and DKIM DNS records. Delivery rate returned to 99%.",
+    "created_date": "2026-02-03",
+    "tags": ["email", "spf", "dkim", "dns"]
+  },
+  {
+    "ticket_id": "TICK-008",
+    "title": "Duplicate patient records after HL7 feed replay",
+    "description": "After the HL7 interface engine was restarted and replayed messages from the queue, the clinical database contains duplicate patient records with the same MRN.",
+    "category": "Data Pipeline",
+    "priority": "High",
+    "status": "Resolved",
+    "resolution": "The ADT loader used INSERT instead of MERGE, so replayed A08 messages created new rows. Rewrote the loader to MERGE on (facility_id, mrn) and ran a dedup script that kept the most recent record per MRN. Added a unique constraint to prevent recurrence.",
+    "created_date": "2026-02-07",
+    "tags": ["hl7", "duplicates", "mrn", "merge"]
+  },
+  {
+    "ticket_id": "TICK-009",
+    "title": "VPN disconnects every 30 minutes",
+    "description": "Remote employees report the VPN client drops the connection about every 30 minutes and requires re-authentication with MFA.",
+    "category": "Network",
+    "priority": "Medium",
+    "status": "Resolved",
+    "resolution": "The VPN gateway's DHCP lease time was set to 30 minutes and lease renewal failed through the tunnel. Increased lease time to 8 hours and enabled lease renewal over the tunnel interface. Disconnects stopped.",
+    "created_date": "2026-02-10",
+    "tags": ["vpn", "disconnect", "dhcp", "remote"]
+  },
+  {
+    "ticket_id": "TICK-010",
+    "title": "Report export to Excel fails for large datasets",
+    "description": "Exporting the claims detail report to Excel fails with 'Out of memory' when the report has more than 200,000 rows.",
+    "category": "Reporting",
+    "priority": "Medium",
+    "status": "Resolved",
+    "resolution": "The SSRS Excel renderer loads the full dataset into memory. Changed large exports to CSV rendering and added a row-count check that suggests CSV above 100,000 rows. Also raised the report server memory limit from 4 GB to 8 GB.",
+    "created_date": "2026-02-14",
+    "tags": ["ssrs", "excel", "export", "memory"]
+  },
+  {
+    "ticket_id": "TICK-011",
+    "title": "Kubernetes pods stuck in CrashLoopBackOff after deploy",
+    "description": "After deploying version 2.4.0 of the billing service, all pods enter CrashLoopBackOff. The previous version runs fine.",
+    "category": "Infrastructure",
+    "priority": "Critical",
+    "status": "Resolved",
+    "resolution": "Version 2.4.0 added a required environment variable BILLING_DB_POOL_SIZE that was missing from the Helm values file. Added the variable to values.yaml and redeployed. Also added a startup check that logs which required variables are missing.",
+    "created_date": "2026-02-18",
+    "tags": ["kubernetes", "crashloopbackoff", "helm", "deploy"]
+  },
+  {
+    "ticket_id": "TICK-012",
+    "title": "BigQuery query costs spiked 5x",
+    "description": "The monthly BigQuery bill increased five times compared to last month. No new dashboards were added.",
+    "category": "Database",
+    "priority": "High",
+    "status": "Resolved",
+    "resolution": "A scheduled query was running SELECT * against an unpartitioned 8 TB events table every 15 minutes. Partitioned the table by event_date, clustered by user_id, and rewrote the query to select only needed columns with a date filter. Costs returned to baseline.",
+    "created_date": "2026-02-21",
+    "tags": ["bigquery", "cost", "partitioning", "scheduled query"]
+  },
+  {
+    "ticket_id": "TICK-013",
+    "title": "Users locked out after MFA device change",
+    "description": "Employees who got new phones cannot log in because MFA codes from their old authenticator app no longer work, and they cannot reach the self-service re-enrollment page without logging in.",
+    "category": "Authentication",
+    "priority": "Medium",
+    "status": "Resolved",
+    "resolution": "Created a help desk procedure: verify identity via manager confirmation, issue a one-time bypass code valid for 1 hour, and have the user re-enroll MFA. Also enabled backup codes at enrollment so users can recover on their own in future.",
+    "created_date": "2026-02-25",
+    "tags": ["mfa", "lockout", "authenticator", "enrollment"]
+  },
+  {
+    "ticket_id": "TICK-014",
+    "title": "SSIS package fails with 'cannot acquire connection'",
+    "description": "The SSIS package that imports vendor files fails with 'The AcquireConnection method call to the connection manager failed' when run from SQL Agent, but works in Visual Studio.",
+    "category": "Data Pipeline",
+    "priority": "Medium",
+    "status": "Resolved",
+    "resolution": "The SQL Agent service account did not have read access to the vendor file share, and the package protection level was EncryptSensitiveWithUserKey so stored passwords could not be decrypted under the agent account. Granted share access and switched to a proxy credential with project-level parameters.",
+    "created_date": "2026-03-02",
+    "tags": ["ssis", "sql agent", "connection manager", "permissions"]
+  },
+  {
+    "ticket_id": "TICK-015",
+    "title": "Slow page load on customer portal",
+    "description": "The customer portal home page takes 8-12 seconds to load. Browser dev tools show a large number of API calls on page load.",
+    "category": "Performance",
+    "priority": "High",
+    "status": "Resolved",
+    "resolution": "The home page made 47 separate API calls to load widgets (N+1 pattern). Added a single aggregate endpoint for the home page, enabled HTTP caching for static widget config, and lazy-loaded below-the-fold widgets. Load time fell to 1.4 seconds.",
+    "created_date": "2026-03-06",
+    "tags": ["performance", "page load", "n+1", "caching"]
+  },
+  {
+    "ticket_id": "TICK-016",
+    "title": "SSL certificate expired on internal API",
+    "description": "Internal services calling the inventory API fail with 'certificate has expired' errors. All dependent jobs stopped at midnight.",
+    "category": "Infrastructure",
+    "priority": "Critical",
+    "status": "Resolved",
+    "resolution": "The certificate was manually issued and not tracked for renewal. Issued a new certificate, moved the service to automated renewal with cert-manager, and added an alert that fires 21 days before any certificate expires.",
+    "created_date": "2026-03-11",
+    "tags": ["ssl", "certificate", "expired", "cert-manager"]
+  },
+  {
+    "ticket_id": "TICK-017",
+    "title": "Quality measure numerator counts too low",
+    "description": "The diabetes HbA1c control measure shows a numerator 30% lower than last year's audited result. The denominator is in line with expectations.",
+    "category": "Reporting",
+    "priority": "High",
+    "status": "Resolved",
+    "resolution": "The value set for HbA1c lab tests was not updated to the current year's version, so new LOINC codes were missing. Loaded the updated value set and re-ran the measure. Numerator matched the expected range within 2%.",
+    "created_date": "2026-03-15",
+    "tags": ["hedis", "quality measure", "value set", "loinc"]
+  },
+  {
+    "ticket_id": "TICK-018",
+    "title": "File upload fails for files over 10 MB",
+    "description": "Users uploading documents larger than 10 MB see a generic error. Smaller files upload fine.",
+    "category": "Integration",
+    "priority": "Low",
+    "status": "Resolved",
+    "resolution": "The nginx reverse proxy had client_max_body_size set to 10M. Increased it to 100M to match the application limit and added a clear error message in the UI when a file exceeds the limit.",
+    "created_date": "2026-03-20",
+    "tags": ["upload", "nginx", "file size", "413"]
+  },
+  {
+    "ticket_id": "TICK-019",
+    "title": "Deadlocks on inventory update transactions",
+    "description": "The inventory service logs frequent deadlock errors (SQL error 1205) during flash sales, causing failed orders.",
+    "category": "Database",
+    "priority": "Critical",
+    "status": "Resolved",
+    "resolution": "Two code paths updated the inventory and reservations tables in opposite order. Standardized lock ordering to always update inventory first, enabled READ_COMMITTED_SNAPSHOT, and added retry logic with exponential backoff for error 1205.",
+    "created_date": "2026-03-24",
+    "tags": ["deadlock", "sql server", "1205", "lock ordering"]
+  },
+  {
+    "ticket_id": "TICK-020",
+    "title": "Scheduled reports sent to wrong recipients",
+    "description": "A regional manager received another region's confidential sales report via the scheduled email subscription.",
+    "category": "Reporting",
+    "priority": "High",
+    "status": "Resolved",
+    "resolution": "The data-driven subscription used a lookup table that had stale manager-to-region mappings after a reorg. Corrected the mappings, added a nightly sync from the HR system, and enabled row-level security on the report so the data itself is filtered by the recipient.",
+    "created_date": "2026-03-28",
+    "tags": ["subscription", "security", "row-level security", "email"]
+  }
+]

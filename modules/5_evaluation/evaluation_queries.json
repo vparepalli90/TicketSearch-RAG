@@ -1,0 +1,74 @@
+[
+  {
+    "query_id": "Q01",
+    "query": "Users get Invalid credentials right after resetting their password",
+    "relevant_ticket_ids": ["TICK-001"],
+    "reference_answer": "Flush the credential cache on all auth nodes and set the cache TTL back to 5 minutes in idp-config.yaml."
+  },
+  {
+    "query_id": "Q02",
+    "query": "Login keeps redirecting back and forth with the identity provider",
+    "relevant_ticket_ids": ["TICK-005"],
+    "reference_answer": "Change the session cookie from SameSite=Strict to SameSite=Lax with the Secure flag."
+  },
+  {
+    "query_id": "Q03",
+    "query": "What authentication problems have we seen and how were they fixed?",
+    "relevant_ticket_ids": ["TICK-001", "TICK-005", "TICK-013"],
+    "reference_answer": "Stale credential cache after password reset (flush cache, TTL 5 min); SSO redirect loop (SameSite=Lax cookie); MFA lockout after phone change (manager-verified bypass code, re-enroll, backup codes)."
+  },
+  {
+    "query_id": "Q04",
+    "query": "ETL load into the warehouse is too slow and times out",
+    "relevant_ticket_ids": ["TICK-002"],
+    "reference_answer": "Switch from full refresh to incremental loading using the updated_at watermark and add an index on updated_at."
+  },
+  {
+    "query_id": "Q05",
+    "query": "Intermittent 502 errors from the API at peak time",
+    "relevant_ticket_ids": ["TICK-004"],
+    "reference_answer": "Set the application keep-alive timeout below the load balancer idle timeout (55s vs 60s)."
+  },
+  {
+    "query_id": "Q06",
+    "query": "SQL Server performance problems: high CPU and deadlocks",
+    "relevant_ticket_ids": ["TICK-006", "TICK-019"],
+    "reference_answer": "High CPU from parameter sniffing: OPTION (RECOMPILE) and a covering index. Deadlocks: consistent lock ordering, READ_COMMITTED_SNAPSHOT, and retry with backoff for error 1205."
+  },
+  {
+    "query_id": "Q07",
+    "query": "Customers aren't receiving our emails even though we sent them",
+    "relevant_ticket_ids": ["TICK-007"],
+    "reference_answer": "Update SPF and DKIM DNS records to include the new mail relay IP range."
+  },
+  {
+    "query_id": "Q08",
+    "query": "Duplicate patient rows with the same MRN after replaying messages",
+    "relevant_ticket_ids": ["TICK-008"],
+    "reference_answer": "Change the ADT loader from INSERT to MERGE on facility_id and MRN, dedupe keeping the latest record, and add a unique constraint."
+  },
+  {
+    "query_id": "Q09",
+    "query": "Our cloud query bill jumped a lot this month",
+    "relevant_ticket_ids": ["TICK-012"],
+    "reference_answer": "Partition the large events table by date, cluster by user_id, and stop SELECT * by selecting only needed columns with a date filter."
+  },
+  {
+    "query_id": "Q10",
+    "query": "Reporting issues: stale dashboards, failed exports, and reports going to the wrong people",
+    "relevant_ticket_ids": ["TICK-003", "TICK-010", "TICK-020"],
+    "reference_answer": "Stale dashboard: schedule extract after ETL with a dependency trigger. Excel export out of memory: use CSV for large exports and raise server memory. Wrong recipients: fix mappings, sync from HR nightly, enable row-level security."
+  },
+  {
+    "query_id": "Q11",
+    "query": "Service fails right after deploy and keeps restarting",
+    "relevant_ticket_ids": ["TICK-011"],
+    "reference_answer": "Add the missing required environment variable to the Helm values file and redeploy."
+  },
+  {
+    "query_id": "Q12",
+    "query": "How do I rotate AWS IAM access keys?",
+    "relevant_ticket_ids": [],
+    "reference_answer": "The ticket history does not cover this."
+  }
+]
